@@ -1,17 +1,16 @@
-from sqlalchemy import Column, String, Integer, Boolean, Enum
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlmodel import SQLModel, Field
 import enum
 
-class EstadoEnum(enum.Enum):
+class EstadoEnum(str, enum.Enum):
     Activo = "Activo"
     Inactivo = "Inactivo"
     Eliminado = "Eliminado"
 
-class Usuario(Base):
+class Usuario(SQLModel, table=True):
     __tablename__ = "usuarios"
-    
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    nombre: Mapped[str] = mapped_column(String(50), nullable=False)
-    email: Mapped[str] = mapped_column(String(100), nullable=False, unique=True)
-    estado: Mapped[EstadoEnum] = mapped_column(Enum(EstadoEnum), nullable=False)
-    premium: Mapped[bool] = mapped_column(Boolean, nullable=False)
+
+    id: int = Field(default=None, primary_key=True)
+    nombre: str
+    email: str = Field(index=True, unique=True)
+    estado: EstadoEnum
+    premium: bool
