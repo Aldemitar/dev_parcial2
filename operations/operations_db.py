@@ -4,8 +4,8 @@ from sqlalchemy.future import select
 from fastapi import HTTPException, status
 from typing import List
 
-from data.models import Usuario
-from data.schemas import UsuarioCreate, EstadoEnum
+from data.models import Usuario, EstadoEnum
+from data.schemas import UsuarioCreate
 
 async def crear_usuario_db(usuario: UsuarioCreate, session: AsyncSession) -> Usuario:
     nuevo_usuario = Usuario(**usuario.dict())
@@ -60,3 +60,10 @@ async def actualizar_premium_usuario_db(email: str, premium: bool, session: Asyn
     except Exception as e:
         await session.rollback()
         raise HTTPException(status_code=400, detail="Error al actualizar el estado premium")
+
+async def obtener_usuarios_activos_db(session: AsyncSession):
+    result = await session.execute(
+        select(Usuario).where(Usuario.estado == EstadoEnum.Activo)
+    )
+    usuarios_activos = result.scalars().all()
+    return usuarios_activos
