@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.future import select
+from sqlalchemy import and_
 from fastapi import HTTPException, status
 from typing import List
 
@@ -67,3 +68,13 @@ async def obtener_usuarios_activos_db(session: AsyncSession):
     )
     usuarios_activos = result.scalars().all()
     return usuarios_activos
+
+async def obtener_usuarios_activos_premium_db(session):
+    query = select(Usuario).where(
+        and_(
+            Usuario.estado == EstadoEnum.Activo,
+            Usuario.premium == True
+        )
+    )
+    result = await session.execute(query)
+    return result.scalars().all()
