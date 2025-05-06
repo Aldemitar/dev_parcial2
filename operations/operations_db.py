@@ -6,7 +6,7 @@ from fastapi import HTTPException, status
 from typing import List
 
 from data.models import Usuario, EstadoEnum, Tarea, EstadoTarea
-from data.schemas import UsuarioCreate
+from data.schemas import UsuarioCreate, TareaCreate
 
 async def crear_usuario_db(usuario: UsuarioCreate, session: AsyncSession) -> Usuario:
     nuevo_usuario = Usuario(**usuario.dict())
@@ -79,8 +79,9 @@ async def obtener_usuarios_activos_premium_db(session):
     result = await session.execute(query)
     return result.scalars().all()
 
-async def crear_tarea_db(tarea: Tarea, session: AsyncSession):
-    session.add(tarea)
+async def crear_tarea_db(tarea: TareaCreate, session: AsyncSession) -> Tarea:
+    nueva_tarea = Tarea(**tarea.dict())
+    session.add(nueva_tarea)
     await session.commit()
-    await session.refresh(tarea)
-    return tarea
+    await session.refresh(nueva_tarea)
+    return nueva_tarea
