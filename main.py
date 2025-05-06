@@ -12,7 +12,7 @@ from sqlalchemy.future import select
 
 from typing import List
 
-from operations.operations_db import crear_usuario_db, obtener_usuarios_db, obtener_usuario_por_email_db, actualizar_estado_usuario_db, actualizar_premium_usuario_db, obtener_usuarios_activos_db
+from operations.operations_db import crear_usuario_db, obtener_usuarios_db, obtener_usuario_por_email_db, actualizar_estado_usuario_db, actualizar_premium_usuario_db, obtener_usuarios_activos_db, obtener_usuarios_activos_premium_db
 
 
 
@@ -49,3 +49,10 @@ async def actualizar_estado_usuario(email: str, estado: EstadoEnum, session: Asy
 @app.patch("/usuarios/{email}/premium", response_model=Usuario)
 async def actualizar_premium_usuario(email: str, premium: bool, session: AsyncSession = Depends(get_session)):
     return await actualizar_premium_usuario_db(email, premium, session)
+
+@app.get("/usuarios/activos/premium", response_model=List[Usuario])
+async def obtener_usuarios_activos_premium(session: AsyncSession = Depends(get_session)):
+    usuarios = await obtener_usuarios_activos_premium_db(session)
+    if not usuarios:
+        raise HTTPException(status_code=404, detail="No hay usuarios activos y que sean premium")
+    return usuarios
