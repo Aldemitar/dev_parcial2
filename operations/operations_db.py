@@ -89,3 +89,7 @@ async def crear_tarea_db(tarea: TareaCreate, session: AsyncSession) -> Tarea:
 async def obtener_tareas_db(session: AsyncSession) -> list[Tarea]:
     result = await session.execute(select(Tarea))
     return result.scalars().all()
+
+async def obtener_tareas_por_usuario_db(usuario_id: int, session: AsyncSession) -> list[Tarea]:
+    result = await session.execute(select(Tarea).where(Tarea.usuario_id == usuario_id))
+    return result.scalars().all()
