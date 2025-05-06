@@ -12,7 +12,7 @@ from sqlalchemy.future import select
 
 from typing import List
 
-from operations.operations_db import crear_usuario_db, obtener_usuarios_db, obtener_usuario_por_email_db, actualizar_estado_usuario_db, actualizar_premium_usuario_db
+from operations.operations_db import crear_usuario_db, obtener_usuarios_db, obtener_usuario_por_email_db, actualizar_estado_usuario_db, actualizar_premium_usuario_db, obtener_usuarios_activos_db
 
 
 
@@ -30,6 +30,13 @@ async def crear_usuario(usuario: UsuarioCreate, session: AsyncSession = Depends(
 @app.get("/usuarios", response_model=List[Usuario])
 async def obtener_usuarios(session: AsyncSession = Depends(get_session)):
     return await obtener_usuarios_db(session)
+
+@app.get("/usuarios/activos", response_model=List[Usuario])
+async def obtener_usuarios_activos(session: AsyncSession = Depends(get_session)):
+    usuarios = await obtener_usuarios_activos_db(session)
+    if not usuarios:
+        raise HTTPException(status_code=404, detail="No hay usuarios activos")
+    return usuarios
 
 @app.get("/usuarios/{email}", response_model=Usuario)
 async def obtener_usuario_por_email(email: str, session: AsyncSession = Depends(get_session)):
