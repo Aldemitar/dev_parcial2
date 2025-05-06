@@ -3,7 +3,7 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from utils.connection_db import init_db
 
 from utils.connection_db import init_db, get_session
-from data.models import Usuario
+from data.models import Usuario, EstadoEnum
 from data.schemas import UsuarioCreate
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,7 +12,7 @@ from sqlalchemy.future import select
 
 from typing import List
 
-from operations.operations_db import crear_usuario_db, obtener_usuarios_db, obtener_usuario_por_email_db
+from operations.operations_db import crear_usuario_db, obtener_usuarios_db, obtener_usuario_por_email_db, actualizar_estado_usuario_db
 
 
 
@@ -34,3 +34,7 @@ async def obtener_usuarios(session: AsyncSession = Depends(get_session)):
 @app.get("/usuarios/{email}", response_model=Usuario)
 async def obtener_usuario_por_email(email: str, session: AsyncSession = Depends(get_session)):
     return await obtener_usuario_por_email_db(email, session)
+
+@app.patch("/usuarios/{email}/estado", response_model=Usuario)
+async def actualizar_estado_usuario(email: str, estado: EstadoEnum, session: AsyncSession = Depends(get_session)):
+    return await actualizar_estado_usuario_db(email, estado, session)
