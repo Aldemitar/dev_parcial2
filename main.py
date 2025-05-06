@@ -4,7 +4,7 @@ from utils.connection_db import init_db
 
 from utils.connection_db import init_db, get_session
 from data.models import Usuario, EstadoEnum, Tarea, EstadoTarea
-from data.schemas import UsuarioCreate
+from data.schemas import UsuarioCreate, TareaCreate, TareaRead
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
@@ -56,6 +56,6 @@ async def obtener_usuarios_activos_premium(session: AsyncSession = Depends(get_s
         raise HTTPException(status_code=404, detail="No hay usuarios activos y que sean premium")
     return usuarios
 
-@app.post("/tareas", status_code=status.HTTP_201_CREATED, tags=["Tareas"])
-async def crear_tarea(tarea: Tarea, session: AsyncSession = Depends(get_session)):
+@app.post("/tareas", response_model=TareaRead, tags=["Tareas"])
+async def crear_tarea(tarea: TareaCreate, session: AsyncSession = Depends(get_session)):
     return await crear_tarea_db(tarea, session)
