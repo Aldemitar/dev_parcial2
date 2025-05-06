@@ -85,3 +85,7 @@ async def crear_tarea_db(tarea: TareaCreate, session: AsyncSession) -> Tarea:
     await session.commit()
     await session.refresh(nueva_tarea)
     return nueva_tarea
+
+async def obtener_tareas_db(session: AsyncSession) -> list[Tarea]:
+    result = await session.execute(select(Tarea))
+    return result.scalars().all()
