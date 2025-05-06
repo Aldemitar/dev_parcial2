@@ -4,6 +4,7 @@ from sqlalchemy.future import select
 from sqlalchemy import and_
 from fastapi import HTTPException, status
 from typing import List
+from datetime import datetime
 
 from data.models import Usuario, EstadoEnum, Tarea, EstadoTarea
 from data.schemas import UsuarioCreate, TareaCreate
@@ -93,3 +94,16 @@ async def obtener_tareas_db(session: AsyncSession) -> list[Tarea]:
 async def obtener_tareas_por_usuario_db(usuario_id: int, session: AsyncSession) -> list[Tarea]:
     result = await session.execute(select(Tarea).where(Tarea.usuario_id == usuario_id))
     return result.scalars().all()
+
+async def actualizar_estado_tarea_db(tarea_id: int, nuevo_estado: str, session: AsyncSession) -> Tarea:
+    result = await session.execute(select(Tarea).where(Tarea.id == tarea_id))
+    tarea = result.scalar_one_or_none()
+    if not tarea:
+        raise ValueError("Tarea no encontrada")
+
+    tarea.estado = nuevo_estado
+    tarea.fecha_modificacion = datetime.utcnow()
+    session.add(tarea)
+    await session.commit()
+    await session.refresh(tarea)
+    return tarea
