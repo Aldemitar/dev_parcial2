@@ -5,7 +5,7 @@ from fastapi import HTTPException, status
 from typing import List
 
 from data.models import Usuario
-from data.schemas import UsuarioCreate
+from data.schemas import UsuarioCreate, EstadoEnum
 
 async def crear_usuario_db(usuario: UsuarioCreate, session: AsyncSession) -> Usuario:
     nuevo_usuario = Usuario(**usuario.dict())
@@ -28,3 +28,19 @@ async def obtener_usuario_por_email_db(email: str, session: AsyncSession) -> Usu
     if not usuario:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
     return usuario
+
+async def actualizar_estado_usuario_db(email: str, estado: EstadoEnum, session: AsyncSession):
+    usuario = await obtener_usuario_por_email_db(email, session)
+    
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    usuario.estado = estado
+    session.add(usuario)
+    
+    try:
+        await session.commit()
+        return usuario
+    except Exception as e:
+        await session.rollback()
+        raise HTTPException(status_code=400, detail="Error al actualizar el estado")
