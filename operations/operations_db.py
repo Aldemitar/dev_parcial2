@@ -21,3 +21,10 @@ async def crear_usuario_db(usuario: UsuarioCreate, session: AsyncSession) -> Usu
 async def obtener_usuarios_db(session: AsyncSession) -> List[Usuario]:
     result = await session.execute(select(Usuario))
     return result.scalars().all()
+
+async def obtener_usuario_por_email_db(email: str, session: AsyncSession) -> Usuario:
+    result = await session.execute(select(Usuario).filter(Usuario.email == email))
+    usuario = result.scalars().first()
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return usuario
