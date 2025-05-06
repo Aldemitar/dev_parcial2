@@ -44,3 +44,19 @@ async def actualizar_estado_usuario_db(email: str, estado: EstadoEnum, session: 
     except Exception as e:
         await session.rollback()
         raise HTTPException(status_code=400, detail="Error al actualizar el estado")
+
+async def actualizar_premium_usuario_db(email: str, premium: bool, session: AsyncSession):
+    usuario = await obtener_usuario_por_email_db(email, session)
+    
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    
+    usuario.premium = premium
+    session.add(usuario)
+    
+    try:
+        await session.commit()
+        return usuario
+    except Exception as e:
+        await session.rollback()
+        raise HTTPException(status_code=400, detail="Error al actualizar el estado premium")
