@@ -5,7 +5,7 @@ from sqlalchemy import and_
 from fastapi import HTTPException, status
 from typing import List
 
-from data.models import Usuario, EstadoEnum
+from data.models import Usuario, EstadoEnum, Tarea, EstadoTarea
 from data.schemas import UsuarioCreate
 
 async def crear_usuario_db(usuario: UsuarioCreate, session: AsyncSession) -> Usuario:
@@ -78,3 +78,9 @@ async def obtener_usuarios_activos_premium_db(session):
     )
     result = await session.execute(query)
     return result.scalars().all()
+
+async def crear_tarea_db(tarea: Tarea, session: AsyncSession):
+    session.add(tarea)
+    await session.commit()
+    await session.refresh(tarea)
+    return tarea
