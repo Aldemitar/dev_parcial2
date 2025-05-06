@@ -8,6 +8,13 @@ from data.schemas import UsuarioCreate
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.future import select
+
+from typing import List
+
+from operations.operations_db import crear_usuario_db, obtener_usuarios_db
+
+
 
 @asynccontextmanager
 async def lifespan(app:FastAPI):
@@ -18,12 +25,8 @@ app = FastAPI(lifespan=lifespan)
 
 @app.post("/usuarios", status_code=status.HTTP_201_CREATED)
 async def crear_usuario(usuario: UsuarioCreate, session: AsyncSession = Depends(get_session)):
-    nuevo_usuario = Usuario(**usuario.dict())
-    session.add(nuevo_usuario)
-    try:
-        await session.commit()
-        await session.refresh(nuevo_usuario)
-        return nuevo_usuario
-    except IntegrityError:
-        await session.rollback()
-        raise HTTPException(status_code=400, detail="Correo ya registrado")
+    return await crear_usuario_db(usuario, session)
+
+@app.get("/usuarios", response_model=List[Usuario])
+async def obtener_usuarios(session: AsyncSession = Depends(get_session)):
+    return await obtener_usuarios_db(session)
