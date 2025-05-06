@@ -22,11 +22,6 @@ async def lifespan(app:FastAPI):
     yield
 app = FastAPI(lifespan=lifespan)
 
-if __name__ == "__main__":
-    import uvicorn
-    port = int(os.environ.get("PORT", 50013))
-    uvicorn.run("main:app", host="0.0.0.0", port=port)
-
 @app.post("/usuarios", status_code=status.HTTP_201_CREATED)
 async def crear_usuario(usuario: UsuarioCreate, session: AsyncSession = Depends(get_session)):
     return await crear_usuario_db(usuario, session)
