@@ -14,7 +14,7 @@ from typing import List
 
 from operations.operations_db import crear_usuario_db, obtener_usuarios_db, obtener_usuario_por_email_db, actualizar_estado_usuario_db, actualizar_premium_usuario_db, obtener_usuarios_activos_db, obtener_usuarios_activos_premium_db
 
-
+import os
 
 @asynccontextmanager
 async def lifespan(app:FastAPI):
@@ -22,6 +22,10 @@ async def lifespan(app:FastAPI):
     yield
 app = FastAPI(lifespan=lifespan)
 
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8080))
+    uvicorn.run("main:app", host="0.0.0.0", port=port)
 
 @app.post("/usuarios", status_code=status.HTTP_201_CREATED)
 async def crear_usuario(usuario: UsuarioCreate, session: AsyncSession = Depends(get_session)):
