@@ -12,7 +12,7 @@ from sqlalchemy.future import select
 
 from typing import List
 
-from operations.operations_db import crear_usuario_db, obtener_usuarios_db, obtener_usuario_por_email_db, actualizar_estado_usuario_db
+from operations.operations_db import crear_usuario_db, obtener_usuarios_db, obtener_usuario_por_email_db, actualizar_estado_usuario_db, actualizar_premium_usuario_db
 
 
 
@@ -38,3 +38,7 @@ async def obtener_usuario_por_email(email: str, session: AsyncSession = Depends(
 @app.patch("/usuarios/{email}/estado", response_model=Usuario)
 async def actualizar_estado_usuario(email: str, estado: EstadoEnum, session: AsyncSession = Depends(get_session)):
     return await actualizar_estado_usuario_db(email, estado, session)
+
+@app.patch("/usuarios/{email}/premium", response_model=Usuario)
+async def actualizar_premium_usuario(email: str, premium: bool, session: AsyncSession = Depends(get_session)):
+    return await actualizar_premium_usuario_db(email, premium, session)
