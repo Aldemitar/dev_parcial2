@@ -3,7 +3,7 @@ from fastapi import FastAPI, Depends, HTTPException, status
 from utils.connection_db import init_db
 
 from utils.connection_db import init_db, get_session
-from data.models import Usuario, EstadoEnum
+from data.models import Usuario, EstadoEnum, Tarea, EstadoTarea
 from data.schemas import UsuarioCreate
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,7 +12,7 @@ from sqlalchemy.future import select
 
 from typing import List
 
-from operations.operations_db import crear_usuario_db, obtener_usuarios_db, obtener_usuario_por_email_db, actualizar_estado_usuario_db, actualizar_premium_usuario_db, obtener_usuarios_activos_db, obtener_usuarios_activos_premium_db
+from operations.operations_db import crear_usuario_db, obtener_usuarios_db, obtener_usuario_por_email_db, actualizar_estado_usuario_db, actualizar_premium_usuario_db, obtener_usuarios_activos_db, obtener_usuarios_activos_premium_db, crear_tarea_db
 
 import os
 
@@ -55,3 +55,7 @@ async def obtener_usuarios_activos_premium(session: AsyncSession = Depends(get_s
     if not usuarios:
         raise HTTPException(status_code=404, detail="No hay usuarios activos y que sean premium")
     return usuarios
+
+@app.post("/tareas", status_code=status.HTTP_201_CREATED, tags=["Tareas"])
+async def crear_tarea(tarea: Tarea, session: AsyncSession = Depends(get_session)):
+    return await crear_tarea_db(tarea, session)
