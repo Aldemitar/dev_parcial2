@@ -12,8 +12,7 @@ from sqlalchemy.future import select
 
 from typing import List
 
-from operations.operations_db import crear_usuario_db, obtener_usuarios_db, obtener_usuario_por_email_db, actualizar_estado_usuario_db, actualizar_premium_usuario_db, obtener_usuarios_activos_db, obtener_usuarios_activos_premium_db, crear_tarea_db, obtener_tareas_db
-
+from operations.operations_db import crear_usuario_db, obtener_usuarios_db, obtener_usuario_por_email_db, actualizar_estado_usuario_db, actualizar_premium_usuario_db, obtener_usuarios_activos_db, obtener_usuarios_activos_premium_db, crear_tarea_db, obtener_tareas_db, obtener_tareas_por_usuario_db
 import os
 
 @asynccontextmanager
@@ -63,3 +62,7 @@ async def crear_tarea(tarea: TareaCreate, session: AsyncSession = Depends(get_se
 @app.get("/tareas", response_model=List[TareaRead], tags=["Tareas"])
 async def listar_tareas(session: AsyncSession = Depends(get_session)):
     return await obtener_tareas_db(session)
+
+@app.get("/tareas/usuario/{usuario_id}", response_model=List[TareaRead], tags=["Tareas"])
+async def tareas_por_usuario(usuario_id: int, session: AsyncSession = Depends(get_session)):
+    return await obtener_tareas_por_usuario_db(usuario_id, session)
