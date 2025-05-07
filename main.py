@@ -12,7 +12,7 @@ from sqlalchemy.future import select
 
 from typing import List
 
-from operations.operations_db import crear_usuario_db, obtener_usuarios_db, obtener_usuario_por_email_db, actualizar_estado_usuario_db, actualizar_premium_usuario_db, obtener_usuarios_activos_db, obtener_usuarios_activos_premium_db, crear_tarea_db, obtener_tareas_db, obtener_tareas_por_usuario_db, actualizar_estado_tarea_db
+from operations.operations_db import crear_usuario_db, obtener_usuarios_db, obtener_usuario_por_email_db, actualizar_estado_usuario_db, actualizar_premium_usuario_db, obtener_usuarios_activos_db, obtener_usuarios_activos_premium_db, crear_tarea_db, obtener_tareas_db, obtener_tareas_por_usuario_db, actualizar_estado_tarea_db, asignar_tarea_usuario_db
 import os
 
 @asynccontextmanager
@@ -71,5 +71,12 @@ async def tareas_por_usuario(usuario_id: int, session: AsyncSession = Depends(ge
 async def actualizar_estado_tarea(tarea_id: int, estado: EstadoTarea, session: AsyncSession = Depends(get_session)):
     try:
         return await actualizar_estado_tarea_db(tarea_id, estado, session)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    
+@app.patch("/tareas/{tarea_id}/asignar", response_model=TareaRead, tags=["Tareas"])
+async def asignar_tarea_usuario(tarea_id: int, nuevo_usuario_id: int, session: AsyncSession = Depends(get_session)):
+    try:
+        return await asignar_tarea_usuario_db(tarea_id, nuevo_usuario_id, session)
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
