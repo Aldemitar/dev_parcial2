@@ -107,3 +107,17 @@ async def actualizar_estado_tarea_db(tarea_id: int, nuevo_estado: str, session: 
     await session.commit()
     await session.refresh(tarea)
     return tarea
+
+async def asignar_tarea_usuario_db(tarea_id: int, nuevo_usuario_id: int, session: AsyncSession) -> Tarea:
+    result = await session.execute(select(Tarea).where(Tarea.id == tarea_id))
+    tarea = result.scalar_one_or_none()
+
+    if not tarea:
+        raise ValueError("Tarea no encontrada")
+
+    tarea.usuario_id = nuevo_usuario_id
+    tarea.fecha_modificacion = datetime.utcnow()
+    session.add(tarea)
+    await session.commit()
+    await session.refresh(tarea)
+    return tarea
